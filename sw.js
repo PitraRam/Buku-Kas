@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keuangan-cache-v1';
+const CACHE_NAME = 'keuangan-pwa-v3'; // Naikkan versi dari v2 ke v3';
 const ASSETS = [
     './',
     './index.html',
