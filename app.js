@@ -1,6 +1,6 @@
 // 1. Registrasi Service Worker agar aplikasi bisa berjalan offline
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('./sw.js')
         .then(() => console.log("Service Worker terdaftar!"))
         .catch(err => console.log("Gagal daftar SW:", err));
 }
@@ -56,7 +56,7 @@ async function renderData() {
 
         // Buat elemen Card/Box untuk bulan tersebut
         let tabelHtml = `
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm mb-4">
                 <h3 class="font-bold text-lg text-gray-700 mb-2 border-b pb-1 flex justify-between">
                     <span>📅 ${namaBulanTeks}</span>
                     <span class="text-sm font-normal text-gray-500">${transaksiBulanIni.length} Transaksi</span>
@@ -118,7 +118,7 @@ form.addEventListener('submit', async (e) => {
     const nominal = parseFloat(document.getElementById('nominal').value);
     const keterangan = document.getElementById('keterangan').value;
     
-    const hari Ini = new Date();
+    const hariIni = new Date(); // <--- PERBAIKAN: Spasi dihapus agar valid
     const tanggal = hariIni.toLocaleDateString('id-ID'); // Format: DD/MM/YYYY
     
     // Membuat tanda pengelompok bulan (Format: YYYY-MM)
@@ -132,15 +132,15 @@ form.addEventListener('submit', async (e) => {
     renderData();
 });
 
-// 5. FUNGSI BARU: MENGHAPUS DATA YANG SALAH INPUT
-async function hapusData(id) {
+// 5. FUNGSI MENGHAPUS DATA YANG SALAH INPUT
+window.hapusData = async function(id) { // <--- PERBAIKAN: Diikat ke objek 'window' agar bisa dipanggil dari HTML onclick
     if (confirm("Apakah Anda yakin ingin menghapus data transaksi ini?")) {
         await db.transaksi.delete(id);
-        renderData(); // Segarkan tampilan setelah dihapus
+        renderData(); 
     }
 }
 
-// 6. FITUR EKSPOR DATA KE CSV (Disesuaikan dengan kolom baru)
+// 6. FITUR EKSPOR DATA KE CSV
 document.getElementById('export-btn').addEventListener('click', async () => {
     const semuaTransaksi = await db.transaksi.toArray();
     if (semuaTransaksi.length === 0) {
@@ -177,7 +177,7 @@ document.getElementById('import-input').addEventListener('change', function(e) {
             
             const tanggal = kolom[0];
             const jenis = kolom[1];
-            const keterangan = kolom[2].replace(/"/g, "");
+            const keterangan = kolom[2] ? kolom[2].replace(/"/g, "") : "";
             const nominal = parseFloat(kolom[3]);
             const bulanTahun = kolom[4] || `${tanggal.split('/')[2]}-${String(tanggal.split('/')[1]).padStart(2, '0')}`;
 
